@@ -17,7 +17,7 @@ Get delta v based on current fuel load
 ship.delta_v
 
 Get Semimajor Axis required to orbit Moho with 4.5 hour period
-calc_Asm("MOHO", period=kerbintime(hours=4,mins=30) )
+calc_Asm(CONST.MOHO, Interval(hours=4,mins=30) )
 
 
 ```
