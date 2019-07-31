@@ -25,6 +25,8 @@ Po - Orbital Period
 ##################################################################
 # Constants
 FUELTOOXY = 9.0/11.0
+OXYTOFUEL = 11.0/9.0
+G0 = 9.80665
 
 ##################################################################
 
@@ -156,7 +158,30 @@ class Ship(object):
         self.drymass = drymass
         self.fuelcapacity = fuelcapacity
         self.oxycapacity = oxyfor(fuelcapacity)
+        self.__fuel = 0
+        self.__oxy = 0
+        
+    def refuel(self):
+        self.__fuel = self.fuelcapacity
+        self.__oxy = self.oxycapacity
+        
+    @property
+    def fuel(self):
+        return (self.__fuel, self.__oxy)
+    
+    @fuel.setter
+    def fuel(self, fuel):
+        self.__fuel = fuel
+        self.__oxy = oxyfor(fuel)
+        
+    @property
+    def totalmass(self):
+        return self.drymass + massfor(self.fuel[0])
 
+    @property
+    def delta_v(self):
+        return self.isp * G0 * math.log(self.totalmass/self.drymass)
+    
 ##################################################################
 
 
@@ -176,7 +201,7 @@ def kerbintime(days=0,hours=0,mins=0,secs=0):
     return secs
 
 def oxyfor(fuel):
-    return fuel * (1/FUELTOOXY)
+    return fuel * (OXYTOFUEL)
 
 def massfor(fuel):
     ox = oxyfor(fuel)
