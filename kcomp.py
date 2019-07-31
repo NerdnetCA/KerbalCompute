@@ -12,6 +12,8 @@ Req - Equatorial Radius (m)
 SGP - Standard Gravitational Parameter (m^3/s^2)
 Gs - Surface Gravity (m/s^2)
 Asm - Semi-major axis
+SRP - Sidereal rotational period
+Psid - Sidereal orbital period
 
 Vesc - Escape Velocity
 Vo - Orbital Velocity
@@ -109,12 +111,18 @@ class Interval(object):
         self.__seconds += interval.seconds
         
 class CelestialBody(object):
-    def __init__(self, asm, req, sgp, gs, srp):
+    def __init__(self, asm, apo, peri, req, sgp, gs, srp, incl, aperi, lan, psid):
         self.Asm = asm
+        self.Apo = apo
+        self.Peri = peri
         self.Req = req
         self.SGP = sgp
         self.Gs = gs
         self.SRP = srp
+        self.Incl = incl
+        self.APeri = aperi
+        self.LAN = lan
+        self.Psid = psid
         
     def Vesc(self, altitude=None, radius=None):
         if radius is not None:
@@ -201,23 +209,23 @@ class Orbit(object):
 #
 
 CONST = PBundle({
-    "KERBOL": CelestialBody (0,261600000,1.1723328E+18,17.1,432000),
-    "MOHO": CelestialBody(5263138304, 250000, 1.6860938E+11, 2.7, 1210000),
-    "EVE": CelestialBody(9832684544, 700000, 8.1717302E+12, 16.7, 80500),
-    "KERBIN": CelestialBody(13599840256, 600000, 3.5316E+12, 9.81, 21549.425),
-    "MUN": CelestialBody(12000000, 200000, 6.5138398E+10, 1.63, 138984.38),
-    "MINMUS": CelestialBody(47000000, 60000, 1.7658E+9, 0.491, 40400),
-    "DUNA": CelestialBody(20726155264, 320000, 3.0136321E+11, 2.94, 65517.859),
-    "DRES": CelestialBody(40839348203, 138000, 2.1484489E+10, 1.13, 34800),
-    "JOOL": CelestialBody(68773560320, 6000000, 2.82528E+14, 7.85, 36000),
-    "EELOO": CelestialBody(90118820000, 210000, 7.4410815E+10, 1.69,19460),
-    "GILLY": CelestialBody(31500000, 13000, 8289449.8, 0.049, 28255),
-    "IKE": CelestialBody(3200000, 130000, 1.8568369E+10, 1.10, 65517.862),
-    "LAYTHE": CelestialBody(27184000, 500000, 1.962E+12, 7.85, 52980.879),
-    "VALL": CelestialBody(43152000, 300000, 2.074815E+11, 2.31, 105962.09),
-    "TYLO": CelestialBody(68500000, 600000, 2.82528E+12, 7.85, 211926.36),
-    "BOP": CelestialBody(128500000, 65000, 2.4868349E+9, 0.589, 544507.43),
-    "POL": CelestialBody(179890000, 44000, 7.2170208E+8, 0.373, 901902.62)
+    "KERBOL": CelestialBody (0,0,0,261600000,1.1723328E+18,17.1,432000,0,0,0,0),
+    "MOHO": CelestialBody(5263138304, 6315765981, 4210510628, 250000, 1.6860938E+11, 2.7, 1210000, 7, 15, 70, 2215754),
+    "EVE": CelestialBody(9832684544, 9931011387, 9734357701, 700000, 8.1717302E+12, 16.7, 80500, 2.1, 0, 15, 5657995),
+    "KERBIN": CelestialBody(13599840256, 13599840256, 13599840256, 600000, 3.5316E+12, 9.81, 21549.425, 0, 0, 0, 9203545),
+    "MUN": CelestialBody(12000000, 12000000, 12000000, 200000, 6.5138398E+10, 1.63, 138984.38, 0, 0, 0, 138984),
+    "MINMUS": CelestialBody(47000000, 47000000, 47000000, 60000, 1.7658E+9, 0.491, 40400, 6, 38, 78, 1077311),
+    "DUNA": CelestialBody(20726155264, 21783189163, 19669121365, 320000, 3.0136321E+11, 2.94, 65517.859, 0.06, 0, 135.5, 17315400),
+    "DRES": CelestialBody(40839348203, 46761053692, 34917642714, 138000, 2.1484489E+10, 1.13, 34800, 5, 90, 280, 47893063),
+    "JOOL": CelestialBody(68773560320, 72212238387, 65334882253, 6000000, 2.82528E+14, 7.85, 36000, 1.304, 0, 52, 104661432),
+    "EELOO": CelestialBody(90118820000, 113549713200, 66687926800, 210000, 7.4410815E+10, 1.69,19460, 6.15, 260, 50, 156992048),
+    "GILLY": CelestialBody(31500000, 48825000, 14175000, 13000, 8289449.8, 0.049, 28255, 2.1, 0, 15, 388587),
+    "IKE": CelestialBody(3200000, 3296000, 3104000, 130000, 1.8568369E+10, 1.10, 65517.862, 0.2, 0, 0, 65518),
+    "LAYTHE": CelestialBody(27184000, 27184000, 27184000, 500000, 1.962E+12, 7.85, 52980.879, 0, 0, 0, 52981),
+    "VALL": CelestialBody(43152000, 43152000, 43152000, 300000, 2.074815E+11, 2.31, 105962.09, 0, 0, 0, 105962),
+    "TYLO": CelestialBody(68500000, 68500000, 68500000, 600000, 2.82528E+12, 7.85, 211926.36, 0.025, 0, 0, 211926),
+    "BOP": CelestialBody(128500000, 158697500, 98302500, 65000, 2.4868349E+9, 0.589, 544507.43, 15, 25, 10, 544507),
+    "POL": CelestialBody(179890000, 210624207, 149155794, 44000, 7.2170208E+8, 0.373, 901902.62, 4.25, 15, 2, 901903)
     })
 ##################################################################
 
