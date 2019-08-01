@@ -107,8 +107,37 @@ class Interval(object):
         secs += mins*60
         self.__seconds += secs
         
-    def add_interval(self, interval):
-        self.__seconds += interval.seconds
+    def __add__(self, interval):
+        return Interval(secs=self.__seconds + interval.seconds)
+        
+    def __mul__(self, scalar):
+        return Interval(secs=self.__seconds * scalar)
+        
+    def __sub__(self, other):
+        return Interval(secs=self.__seconds - interval.seconds)
+        
+    def __truediv__(self, scalar):
+        return Interval(secs=math.floor(self.__seconds / scalar))
+        
+    def __lt__(self, other):
+        return self.__seconds < other.__seconds
+    
+    def __le__(self, other):
+        return self.__seconds <= other.__seconds
+    
+    def __eq__(self, other):
+        return self.__seconds == other.__seconds
+    
+    def __ne__(self, other):
+        return self.__seconds != other.__seconds
+    
+    def __gt__(self, other):
+        return self.__seconds > other.__seconds
+    
+    def __ge__(self, other):
+        return self.__seconds >= other.__seconds
+    
+    
         
 class CelestialBody(object):
     def __init__(self, asm, apo, peri, req, sgp, gs, srp, incl, aperi, lan, psid):
