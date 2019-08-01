@@ -149,10 +149,15 @@ class Orbit(object):
             self.__apoapsis = apoapsis + body.Req
             self.__periapsis = periapsis + body.Req
     
+    def dup(self):
+        o = Orbit(self.body, self.__apoapsis, self.__periapsis, True)
+        return o
+    
     @property
     def apoapsis(self):
         return self.__apoapsis - self.body.Req
     
+    @property
     def apoapsis_f(self):
         return self.__apoapsis
     
@@ -195,6 +200,13 @@ class Orbit(object):
         self.__apoapsis = a
         self.__periapsis = a
 
+    def get_synodic(self, orbit):
+        p1 = self.period.seconds
+        p2 = orbit.period.seconds
+        if p1 > p2:
+            p1, p2 = p2, p1
+        return Interval(secs=1/((1/p1)-(1/p2)))
+    
     def tune_peri(self, interval):
         t = interval.seconds if isinstance(interval, Interval) else interval
         a = math.pow((self.body.SGP*t**2)/(4*math.pi**2), 1./3.)
