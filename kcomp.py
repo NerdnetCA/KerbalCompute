@@ -9,7 +9,7 @@ import math
 """
 
 Req - Equatorial Radius (m)
-SGP - Standard Gravitational Parameter (m^3/s^2)
+SGP - Standard Gravitational Parameter (m^3/s^2) 
 Gs - Surface Gravity (m/s^2)
 Asm - Semi-major axis
 SRP - Sidereal rotational period
@@ -117,6 +117,7 @@ class CelestialBody(object):
         self.Peri = peri
         self.Req = req
         self.SGP = sgp
+        self.μ = sgp
         self.Gs = gs
         self.SRP = srp
         self.Incl = incl
@@ -132,10 +133,15 @@ class CelestialBody(object):
         else:
             r=self.Req
         return math.sqrt((2*self.SGP)/r)
+    
+    def get_orbit(self, parent):
+        return Orbit(parent, self.Apo, self.Peri, True)
 
 class Orbit(object):
     def __init__(self, body, apoapsis=100000, periapsis=100000, fromcentre=False):
         self.body = body
+        if apoapsis < periapsis:
+            apoapsis, periapsis = periapsis, apoapsis
         if fromcentre:
             self.__apoapsis = apoapsis
             self.__periapsis = periapsis
@@ -161,10 +167,14 @@ class Orbit(object):
     @apoapsis.setter
     def apoapsis(self, v):
         self.__apoapsis = v+self.body.Req
+        if self.__apoapsis < self.__periapsis:
+            self.__apoapsis, self.__periapsis = self.__periapsis, self.__apoapsis
         
     @periapsis.setter
     def periapsis(self, v):
         self.__periapsis = v+self.body.Req
+        if self.__apoapsis < self.__periapsis:
+            self.__apoapsis, self.__periapsis = self.__periapsis, self.__apoapsis
         
     @property
     def Asm(self):
@@ -189,11 +199,15 @@ class Orbit(object):
         t = interval.seconds if isinstance(interval, Interval) else interval
         a = math.pow((self.body.SGP*t**2)/(4*math.pi**2), 1./3.)
         self.__periapsis = (2*a) - self.__apoapsis
+        if self.__apoapsis < self.__periapsis:
+            self.__apoapsis, self.__periapsis = self.__periapsis, self.__apoapsis
         
     def tune_apo(self, interval):
         t = interval.seconds if isinstance(interval, Interval) else interval
         a = math.pow((self.body.SGP*t**2)/(4*math.pi**2), 1./3.)
         self.__apoapsis = (2*a) - self.__periapsis
+        if self.__apoapsis < self.__periapsis:
+            self.__apoapsis, self.__periapsis = self.__periapsis, self.__apoapsis
 
     def Vo(self, altitude):
         r = self.body.Req + altitude
