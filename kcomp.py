@@ -42,7 +42,7 @@ class PBundle(object):
     def __init__(self, values):
         self.__dict__.update(values)
         
-class Ship(object):
+class Vessel(object):
     def __init__(self, isp, drymass, fuelcapacity):
         self.isp = isp
         self.drymass = drymass
@@ -72,7 +72,7 @@ class Ship(object):
     def delta_v(self):
         return self.isp * G0 * math.log(self.totalmass/self.drymass)
     
-class Interval(object):
+class Period(object):
     def __init__(self, days=0, hours=0, mins=0, secs=0):
         hours += days*6
         mins += hours*60
@@ -108,16 +108,16 @@ class Interval(object):
         self.__seconds += secs
         
     def __add__(self, interval):
-        return Interval(secs=self.__seconds + interval.seconds)
+        return Period(secs=self.__seconds + interval.seconds)
         
     def __mul__(self, scalar):
-        return Interval(secs=self.__seconds * scalar)
+        return Period(secs=self.__seconds * scalar)
         
     def __sub__(self, other):
-        return Interval(secs=self.__seconds - interval.seconds)
+        return Period(secs=self.__seconds - interval.seconds)
         
     def __truediv__(self, scalar):
-        return Interval(secs=math.floor(self.__seconds / scalar))
+        return Period(secs=math.floor(self.__seconds / scalar))
         
     def __lt__(self, other):
         return self.__seconds < other.__seconds
@@ -209,10 +209,15 @@ class Orbit(object):
         self.__periapsis = v+self.body.Req
         if self.__apoapsis < self.__periapsis:
             self.__apoapsis, self.__periapsis = self.__periapsis, self.__apoapsis
-        
+
     @property
     def Asm(self):
         return (self.__apoapsis + self.__periapsis)/2
+    
+    @Asm.setter
+    def Asm(self, value):
+        self.__apoapsis = self.__periapsis = value/2
+        return
     
     @property
     def eccentricity(self):
@@ -220,11 +225,11 @@ class Orbit(object):
         
     @property
     def period(self):
-        return Interval(secs=2*math.pi*math.sqrt(self.Asm**3/self.body.SGP))
+        return Period(secs=2*math.pi*math.sqrt(self.Asm**3/self.body.SGP))
         
     @period.setter
     def period(self, interval):
-        t = interval.seconds if isinstance(interval, Interval) else interval
+        t = interval.seconds if isinstance(interval, Period) else interval
         a = math.pow((self.body.SGP*t**2)/(4*math.pi**2), 1./3.)
         self.__apoapsis = a
         self.__periapsis = a
@@ -234,17 +239,17 @@ class Orbit(object):
         p2 = orbit.period.seconds
         if p1 > p2:
             p1, p2 = p2, p1
-        return Interval(secs=1/((1/p1)-(1/p2)))
+        return Period(secs=1/((1/p1)-(1/p2)))
     
     def tune_peri(self, interval):
-        t = interval.seconds if isinstance(interval, Interval) else interval
+        t = interval.seconds if isinstance(interval, Period) else interval
         a = math.pow((self.body.SGP*t**2)/(4*math.pi**2), 1./3.)
         self.__periapsis = (2*a) - self.__apoapsis
         if self.__apoapsis < self.__periapsis:
             self.__apoapsis, self.__periapsis = self.__periapsis, self.__apoapsis
         
     def tune_apo(self, interval):
-        t = interval.seconds if isinstance(interval, Interval) else interval
+        t = interval.seconds if isinstance(interval, Period) else interval
         a = math.pow((self.body.SGP*t**2)/(4*math.pi**2), 1./3.)
         self.__apoapsis = (2*a) - self.__periapsis
         if self.__apoapsis < self.__periapsis:
