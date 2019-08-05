@@ -216,7 +216,7 @@ class Orbit(object):
     
     @Asm.setter
     def Asm(self, value):
-        self.__apoapsis = self.__periapsis = value/2
+        self.__apoapsis = self.__periapsis = value
         return
     
     @property
