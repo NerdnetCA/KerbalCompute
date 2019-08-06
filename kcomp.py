@@ -101,6 +101,9 @@ class Period(object):
     def __repr__(self):
         return str(self.time)
     
+    def __str__(self):
+        return "%dd %dh %ds %dm"%self.time
+    
     def add(self, days=0, hours=0, mins=0, secs=0):
         hours += days*6
         mins += hours*60
@@ -303,6 +306,16 @@ def km(v):
 def Mm(v):
     return v*1000000
 
+def m(v):
+    t = 'm'
+    if v > 100000:
+        v /= 1000
+        t='km'
+    if v > 100000:
+        v /= 1000
+        t='Mm'
+    return str(v)+t
+        
 def oxyfor(fuel):
     return fuel * (OXYTOFUEL)
 
