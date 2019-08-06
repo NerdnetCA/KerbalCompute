@@ -314,7 +314,7 @@ def m(v):
     if v > 100000:
         v /= 1000
         t='Mm'
-    return str(v)+t
+    return "%.2f"%(v,)+t
         
 def oxyfor(fuel):
     return fuel * (OXYTOFUEL)
