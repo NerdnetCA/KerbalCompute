@@ -1,6 +1,11 @@
 # KerbalCompute
 Orbital Mechanics tools for Kerbal Space Program
 
+# Status
+
+Currently in overhaul, so I won't bother with much documentation right now.
+
+# Old Usage Example
 
 ```
 >>> CONST.MUN.Apo

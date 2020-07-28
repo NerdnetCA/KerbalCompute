@@ -37,6 +37,136 @@ G0 = 9.80665
 ##################################################################
 # Classes
 
+class Payload(object):
+    """Base class for a rocket component with mass.
+    """
+    def __init__(self, mass):
+        self.__mass = mass
+        
+    @property
+    def mass(self):
+        return self.__mass
+    
+class Stage(Payload):
+    """Stage is used for calculating delta V.
+    Fields:
+    payload - anything in a stage above the current one.
+    tank - the fuel tanks of this stage
+    engine - the engine, or cluster.
+    """
+    def __init__(self, payload, tank, engine):
+        super().__init__(0)
+        self.payload = payload
+        self.tank = tank
+        self.engine = engine
+        
+    @property
+    def mass(self):
+        return self.payload.mass + self.tank.mass + self.engine.mass
+
+    @property
+    def dv(self):
+        drymass = self.payload.mass + self.engine.mass
+        drymass += self.tank.drymass
+        totalmass = drymass + self.tank.mas
+        return self.engine.isp * G0 * math.log(totalmass/drymass)
+    
+    
+class Engine(Payload):
+    """Basic Engine - holds mass, thrust, and isp parameters.
+    
+    """
+    def __init__(self, mass, isp, thrust):
+        super().__init__(mass)
+        self.__isp = isp
+        self.__thrust = thrust
+        
+    @property
+    def isp(self):
+        return self.__isp
+    
+    @property
+    def thrust(self):
+        return self.__thrust
+    
+    @property
+    def massfuelflow(self):
+        return self.__thrust / (self.__isp)
+       
+       
+class EngineCluster(Engine):
+    """Holds multiple Engine instances, providing combined Isp and Thrust values.
+    """
+    def __init__(self):
+        """New EngineCluster is initialized with zero mass."""
+        super().__init__(0,0,0)
+        self.__engines = []
+        
+    def add_engine(self, engine):
+        """Add an engine to this cluster."""
+        self.__engines.append(engine)
+        
+    @property
+    def isp(self):
+        return self.thrust / self.massfuelflow
+    
+    @property
+    def thrust(self):
+        return sum([e.thrust for e in self.__engines])
+    
+    @property
+    def massfuelflow(self):
+        return sum([e.massfuelflow for e in self.__engines])
+            
+    
+        
+class FuelType(object):
+    def __init__(self, name, density):
+        self.name = name
+        self._density = density
+        
+    def massof(self, volume):
+        return volume * self.__density
+    
+class LfoFuel(FuelType):
+    def __init__(self):
+        super().__init__("LFO",.005)
+        
+    def massof(self, volume):
+        return self._density * (oxyfor(volume) + volume)
+        
+class FuelTank(Payload):
+    def __init__(self,mass,fuelvolume,fueltype=None):
+        """Initialize new fuel tank.
+        mass - total mass including fuel
+        fuelvolume - maximum fuel capacity in volume units
+        fueltype - optional, defaults to LFO 
+        """
+        if fueltype is None:
+            fueltype = DEFAULT_FUEL
+        super().__init__(mass - fueltype.massof(fuelvolume))
+        self.fueltype = fueltype
+        self.fuelvolume = fuelvolume
+        self.maxfuel = fuelvolume
+        
+    @property
+    def fuelvolume(self):
+        return self.fuelvolume
+    
+    @fuelvolume.setter
+    def set_fuelvolume(self,fuelvolume):
+        self.fuelvolume = fuelvolume
+    
+    @property
+    def mass(self):
+        return self.__mass + self.fueltype.massof(self.fuelvolume)
+        
+    @property
+    def drymass(self):
+        return self.__mass
+    
+    
+    
 # Utility class
 class PBundle(object):
     def __init__(self, values):
@@ -270,6 +400,12 @@ class Orbit(object):
     
 ##################################################################
 
+############
+# Default fuel
+FUEL_LFO = LfoFuel()
+FUEL_XENON = FuelType('Xenon',1)
+
+DEFAULT_FUEL = FUEL_LFO
 
 
 ##################################################################
