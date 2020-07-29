@@ -203,6 +203,7 @@ class Vessel(object):
     def delta_v(self):
         return self.isp * G0 * math.log(self.totalmass/self.drymass)
     
+    
 class Period(object):
     def __init__(self, days=0, hours=0, mins=0, secs=0):
         hours += days*6
@@ -271,7 +272,6 @@ class Period(object):
     def __ge__(self, other):
         return self.__seconds >= other.__seconds
     
-    
         
 class KelestialBody(object):
     def __init__(self, asm, apo, peri, req, sgp, gs, srp, incl, aperi, lan, psid):
@@ -300,8 +300,10 @@ class KelestialBody(object):
     def get_orbit(self, parent):
         return Orbit(parent, self.Apo, self.Peri, True)
 
+
 class KelestialBodyError(Exception):
     pass
+
 
 class Orbit(object):
     def __init__(self, body, apoapsis=100000, periapsis=100000, fromcentre=False):
