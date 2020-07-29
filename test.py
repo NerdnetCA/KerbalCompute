@@ -13,6 +13,9 @@ print("Target Orbit Apo : ",m(o_final.apoapsis))
 print("Target Orbit Peri : ",m(o_final.periapsis))
 print("***")
 
+nsat=3
+syn = o_final.get_synodic(o_start)
+
 o_transfer = o_start.dup()
 o_transfer.periapsis = o_final.periapsis
 dv_burn1 = o_start.Vo(o_start.apoapsis) - o_transfer.Vo(o_transfer.apoapsis)
@@ -23,8 +26,6 @@ print("Final Burn dV :",dv_burn2)
 print("Total dV: ", dv_burn1 + dv_burn2)
 print("Launch Interval for %d satellites : %s"%(nsat, syn/nsat))
 
-syn = o_final.get_synodic(o_start)
-nsat = 3
 print("***")
 
 rp = o_final.period + o_final.period/3
@@ -36,7 +37,15 @@ print("Resonant Peri :", m(o_resonant.periapsis))
 
 rdv_burn2 =  o_resonant.Vo(o_resonant.periapsis) - o_transfer.Vo(o_transfer.periapsis)
 rdv_burn3 = o_resonant.Vo(o_resonant.periapsis) - o_final.Vo(o_final.apoapsis)
-print("Resonant transfer burn :",dv_burn1)
-print("Resonant Burn 1 :",rdv_burn2)
-print("Resonant Final burn :",rdv_burn3)
-print("Total dV :",dv_burn1+rdv_burn2+rdv_burn3)
+print("Resonant transfer burn :",mss(dv_burn1))
+print("Resonant Burn 1 :",mss(rdv_burn2))
+print("Resonant Final burn :",mss(rdv_burn3))
+print("Total dV :",mss(dv_burn1+rdv_burn2+rdv_burn3))
+print('***')
+##########
+
+payload = Payload(10)
+tank = FuelTank(5,360)
+engine = Engine(5,290,360)
+stage = Stage(payload,tank,engine)
+print("Stage dV : %s"%mss(stage.dv))

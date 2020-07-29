@@ -68,7 +68,7 @@ class Stage(Payload):
     def dv(self):
         drymass = self.payload.mass + self.engine.mass
         drymass += self.tank.drymass
-        totalmass = drymass + self.tank.mas
+        totalmass = drymass + self.tank.mass
         return self.engine.isp * G0 * math.log(totalmass/drymass)
     
     
@@ -119,7 +119,6 @@ class EngineCluster(Engine):
         return sum([e.massfuelflow for e in self.__engines])
             
     
-        
 class FuelType(object):
     def __init__(self, name, density):
         self.name = name
@@ -128,13 +127,15 @@ class FuelType(object):
     def massof(self, volume):
         return volume * self._density
     
+    
 class LfoFuel(FuelType):
     def __init__(self):
         super().__init__("LFO",.005)
         
     def massof(self, volume):
         return self._density * (oxyfor(volume) + volume)
-        
+    
+    
 class FuelTank(Payload):
     def __init__(self,mass,fuelvolume,fueltype=None):
         """Initialize new fuel tank.
@@ -166,12 +167,12 @@ class FuelTank(Payload):
         return self._mass
     
     
-    
 # Utility class
 class PBundle(object):
     def __init__(self, values):
         self.__dict__.update(values)
-        
+    
+    
 class Vessel(object):
     def __init__(self, isp, drymass, fuelcapacity):
         self.isp = isp
@@ -232,7 +233,7 @@ class Period(object):
         return str(self.time)
     
     def __str__(self):
-        return "%dd %dh %ds %dm"%self.time
+        return "%dd %dh %dm %ds"%self.time
     
     def add(self, days=0, hours=0, mins=0, secs=0):
         hours += days*6
@@ -454,6 +455,9 @@ def m(v):
         t='Mm'
     return "%.2f"%(v,)+t
         
+def mss(v):
+    return "%.2f"%(v,)+"m/s^2"
+
 def oxyfor(fuel):
     return fuel * (OXYTOFUEL)
 
