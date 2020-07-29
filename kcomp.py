@@ -41,11 +41,11 @@ class Payload(object):
     """Base class for a rocket component with mass.
     """
     def __init__(self, mass):
-        self.__mass = mass
+        self._mass = mass
         
     @property
     def mass(self):
-        return self.__mass
+        return self._mass
     
 class Stage(Payload):
     """Stage is used for calculating delta V.
@@ -126,7 +126,7 @@ class FuelType(object):
         self._density = density
         
     def massof(self, volume):
-        return volume * self.__density
+        return volume * self._density
     
 class LfoFuel(FuelType):
     def __init__(self):
@@ -146,24 +146,24 @@ class FuelTank(Payload):
             fueltype = DEFAULT_FUEL
         super().__init__(mass - fueltype.massof(fuelvolume))
         self.fueltype = fueltype
-        self.fuelvolume = fuelvolume
-        self.maxfuel = fuelvolume
+        self._fuelvolume = fuelvolume
+        self._maxfuel = fuelvolume
         
     @property
     def fuelvolume(self):
-        return self.fuelvolume
+        return self._fuelvolume
     
     @fuelvolume.setter
     def set_fuelvolume(self,fuelvolume):
-        self.fuelvolume = fuelvolume
+        self._fuelvolume = fuelvolume
     
     @property
     def mass(self):
-        return self.__mass + self.fueltype.massof(self.fuelvolume)
+        return self._mass + self.fueltype.massof(self._fuelvolume)
         
     @property
     def drymass(self):
-        return self.__mass
+        return self._mass
     
     
     
@@ -403,7 +403,9 @@ class Orbit(object):
 ############
 # Default fuel
 FUEL_LFO = LfoFuel()
-FUEL_XENON = FuelType('Xenon',1)
+FUEL_XENON = FuelType('Xenon',.0001)
+FUEL_MONO = FuelType('Mono',.004)
+
 
 DEFAULT_FUEL = FUEL_LFO
 
